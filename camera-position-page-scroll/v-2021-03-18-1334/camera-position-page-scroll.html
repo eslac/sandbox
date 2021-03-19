@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+	<meta http-equiv="content-type" content="text/html; charset=UTF-8">
+	<title>threejs Change camera position on page scroll</title>
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+
+	<script src="https://cdn.jsdelivr.net/gh/mrdoob/three.js@r126/build/three.min.js"></script>
+	<script src="https://cdn.jsdelivr.net/gh/mrdoob/three.js@r126/examples/js/controls/OrbitControls.js"></script>
+
+	<style id="compiled-css" type="text/css">
+		body {
+			overflow: hidden;
+
+			padding: 0;
+			margin: 0;
+		}
+
+		#viewport {
+			position: fixed;
+			border: 1px solid red;
+			margin: 0;
+			padding: 0;
+			left: 0;
+			top: 0;
+			right: 0;
+			bottom: 0;
+			/* width: 15rem; */
+		}
+
+		.page-wrapper {
+			padding: 0px;
+			/* margin: 12px 48px; */
+			position: absolute;
+			height: 100vh;
+			left: 0;
+			top: 0;
+			/* width: calc(100% - 2*48px); */
+			width: 30%;
+			word-wrap: break-word;
+			overflow-y: scroll;
+		}
+
+		/* EOS */
+	</style>
+
+	<script id="insert"></script>
+
+
+</head>
+
+<body>
+
+	<!-- https://stackoverflow.com/questions/54455270/three-js-change-camera-position-on-page-scroll -->
+
+	<canvas id="viewport"></canvas>
+
+
+	<div id="div1" class="page-wrapper">
+		<h3>
+			Three.js: Change camera position on page scroll
+		</h3>
+		<p>
+			Lorem ipsum dolor sit amet, consectetur adipiscing elit. Mauris quis vulputate neque. Proin ullamcorper nisi
+			libero. Praesent ac tincidunt est. Pellentesque convallis tincidunt felis, non dignissim sapien dignissim
+			nec. Donec luctus ligula ligula, ut
+			consectetur massa vulputate ac. Donec mattis feugiat iaculis. Fusce id leo at lectus ornare tempor.
+			Suspendisse potenti. Praesent purus nisi, accumsan eu facilisis et, convallis et tellus. Quisque vestibulum
+			lectus lectus, a aliquet ligula malesuada
+			vel. Nullam vestibulum ut sapien consectetur luctus. Aenean augue lacus, sodales sit amet tincidunt vitae,
+			facilisis in mi. Nulla facilisi.
+		</p>
+
+	</div>
+
+
+	<script type="text/javascript">
+
+		let renderer;
+		let camera;
+		let scene;
+		//let controls;
+
+		init();
+
+		animate();
+
+		function init() {
+
+			scene = new THREE.Scene();
+			camera = new THREE.PerspectiveCamera( 54, window.innerWidth * 0.2 / window.innerHeight, 0.1, 1000 );
+
+			renderer = new THREE.WebGLRenderer( {
+				antialias: true,
+				canvas: document.getElementById( "viewport" )
+			} );
+			renderer.setSize( window.innerWidth * 0.3, window.innerHeight );
+			renderer.setClearColor( new THREE.Color( 0xfefefe ) );
+			// document.body.appendChild(renderer.domElement);
+
+			camera.position.x = 1.5;
+			camera.position.y = 5;
+			camera.position.z = -1.5 + window.scrollY / 250.0;
+			camera.lookAt( 0, 0, -1.5 );
+
+			//controls = new THREE.OrbitControls(camera);
+
+			// white spotlight shining from the side, casting a shadow
+			let spotLight = new THREE.SpotLight( 0xffffff, 2.5, 25, Math.PI / 6 );
+			spotLight.position.set( 9, 10, 1 );
+			scene.add( spotLight );
+
+			let gridHelper = new THREE.GridHelper( 4, 4 );
+			scene.add( gridHelper );
+
+			// example code
+			const geometry = new THREE.BoxGeometry( 1, 1, 1 );
+			const material = new THREE.MeshStandardMaterial( {
+				color: 0xff0000
+			} );
+			const topBox = new THREE.Mesh( geometry, material );
+			scene.add( topBox );
+
+			txt = "";
+
+			for ( let i = 0; i < 20; i++ ) {
+
+				txt += "&nbsp;<br>"
+
+			}
+
+			div1.innerHTML += txt
+
+		}
+		///// end of example
+
+		function animate() {
+			requestAnimationFrame( animate );
+
+			//controls.update();
+			renderer.render( scene, camera );
+		};
+
+
+
+		function updateCamera( ev ) {
+
+			console.log( "bottom", div1.scrollHeight );
+			//console.log( "", div1.offsetHeight );
+
+			const styleElement = getComputedStyle( div1 );
+			console.log( "computed", styleElement.height );
+
+			var rect = div1.getBoundingClientRect();
+			console.log( "height: " + rect.height );
+			//camera.position.z = -1.5 + div1.scrollY / 250.0;
+		}
+
+		div1.addEventListener( "scroll", updateCamera );
+
+
+	</script>
+
+
+</body>
+
+</html>

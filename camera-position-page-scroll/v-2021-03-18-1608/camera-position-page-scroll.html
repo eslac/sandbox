@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+	<meta http-equiv="content-type" content="text/html; charset=UTF-8">
+	<title>threejs Change camera position on page scroll</title>
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+
+	<script src="https://cdn.jsdelivr.net/gh/mrdoob/three.js@r126/build/three.min.js"></script>
+	<script src="https://cdn.jsdelivr.net/gh/mrdoob/three.js@r126/examples/js/controls/OrbitControls.js"></script>
+
+	<style id="compiled-css" type="text/css">
+		body {
+			padding: 0;
+			margin: 0;
+		}
+
+		#viewport {
+			position: fixed;
+			border: 1px solid red;
+			margin: 0;
+			padding: 0;
+			left: 0;
+			top: 0;
+			right: 0;
+			bottom: 0;
+			/* width: 15rem; */
+		}
+
+		.page-wrapper {
+			padding: 0px;
+			/* margin: 12px 48px; */
+			position: fixed;
+			height: 100vh;
+			left: 0;
+			top: 0;
+			/* width: calc(100% - 2*48px); */
+			width: 30%;
+			word-wrap: break-word;
+			overflow-y: scroll;
+		}
+
+		#divContent {
+
+position: absolute;
+			left: 0;
+			right: 0;
+			margin: 0 auto;
+			width: 20rem;
+
+		}
+
+		/* EOS */
+	</style>
+
+	<script id="insert"></script>
+
+
+</head>
+
+<body>
+
+	<!-- https://stackoverflow.com/questions/54455270/three-js-change-camera-position-on-page-scroll -->
+
+	<canvas id="viewport"></canvas>
+
+	<div id="div1" class="page-wrapper"></div>
+
+	<div id=divContent>
+
+
+
+	</div>
+
+
+	<script type="text/javascript">
+
+		let renderer;
+		let camera;
+		let scene;
+		//let controls;
+
+		init();
+
+		animate();
+
+		function init() {
+
+			scene = new THREE.Scene();
+			camera = new THREE.PerspectiveCamera( 54, window.innerWidth * 0.2 / window.innerHeight, 0.1, 1000 );
+
+			renderer = new THREE.WebGLRenderer( {
+				antialias: true,
+				canvas: document.getElementById( "viewport" )
+			} );
+			renderer.setSize( window.innerWidth * 0.3, window.innerHeight );
+			renderer.setClearColor( new THREE.Color( 0xfefefe ) );
+			//document.body.appendChild(renderer.domElement);
+
+			camera.position.set( -100, -100, 100 );
+			camera.up.set( 0, 0, 1 );
+			camera.lookAt( 0, 0, 0 );
+
+			// camera.position.x = 1.5;
+			// camera.position.y = 5;
+			// camera.position.z = -1.5 + window.scrollY / 250.0;
+			// camera.lookAt( 0, 0, -1.5 );
+
+			//controls = new THREE.OrbitControls(camera, renderer.domElement);
+
+			// white spotlight shining from the side, casting a shadow
+			let spotLight = new THREE.SpotLight( 0xffffff, 2.5, 100, Math.PI / 6 );
+			spotLight.position.set( 100, 100, 0 );
+			scene.add( spotLight );
+
+			let gridHelper = new THREE.GridHelper( 50, 10 );
+			gridHelper.rotation.x = 1.51
+			scene.add( gridHelper );
+
+			addBox()
+
+			txt = "";
+
+			for ( let i = 0; i < 50; i++ ) {
+
+				txt += "&nbsp;<br>"
+
+			}
+
+			div1.innerHTML += txt;
+
+			lorem = "<h3>content</h3><p>lorem ipsum, quia dolor sit, amet, consectetur, adipisci velit, sed quia non numquam eius modi tempora incidunt, ut labore et dolore magnam aliquam quaerat voluptatem. ut enim ad minima veniam, quis nostrum exercitationem ullam corporis suscipit laboriosam, nisi ut aliquid ex ea commodi consequatur? quis autem vel eum iure reprehenderit, qui in ea voluptate velit esse, quam nihil molestiae consequatur, vel illum, qui dolorem eum fugiat, quo voluptas nulla pariatur?</p>"
+
+			text2 = lorem.repeat( 5 )
+			divContent.innerHTML = text2;
+
+		}
+
+
+		function addBox() {
+
+			count = 20;
+
+			for ( let i = 0; i < count; i++ ) {
+				const geometry = new THREE.BoxGeometry( 20, 20, 10 );
+				const material = new THREE.MeshBasicMaterial( {
+					color: 0xff0000
+				} );
+				const box = new THREE.Mesh( geometry, material );
+				box.position.z = 100 - i * 25;
+				scene.add( box );
+			}
+		}
+
+		function animate() {
+			requestAnimationFrame( animate );
+
+			//controls.update();
+			renderer.render( scene, camera );
+		};
+
+
+
+		function updateCamera( ev ) {
+
+			console.log( "bottom", div1.scrollHeight - div1.clientHeight );
+			console.log( "top", ev.target.scrollTop );
+
+			const styleElement = getComputedStyle( div1 );
+			//console.log( "computed", styleElement.height );
+
+			var rect = div1.getBoundingClientRect();
+			//console.log( "height: " + rect.height );
+			camera.position.z = -1.5 + div1.scrollY / 250.0;
+
+			camera.position.z = 100 - ev.target.scrollTop;
+
+			//camera.lookAt( 0, 0, ev.target.scrollTop )
+		}
+
+		div1.addEventListener( "scroll", updateCamera );
+
+
+	</script>
+
+
+</body>
+
+</html>

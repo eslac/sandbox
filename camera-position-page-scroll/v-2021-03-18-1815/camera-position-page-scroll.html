@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+	<meta http-equiv="content-type" content="text/html; charset=UTF-8">
+	<title>threejs Change camera position on page scroll</title>
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+
+	<script src="https://cdn.jsdelivr.net/gh/mrdoob/three.js@r126/build/three.min.js"></script>
+	<script src="https://cdn.jsdelivr.net/gh/mrdoob/three.js@r126/examples/js/controls/OrbitControls.js"></script>
+
+	<script src="thrr-three-raycaster-mousedown-2021-03-18.js"></script>
+
+	<style id="compiled-css" type="text/css">
+		body {
+			font: 100% monospace;
+			padding: 0;
+			margin: 0;
+		}
+
+		#viewport {
+			position: fixed;
+			border: 1px solid red;
+			margin: 0;
+			padding: 0;
+			left: 0;
+			top: 0;
+			right: 0;
+			bottom: 0;
+			/* width: 15rem; */
+			z-index: 1;
+		}
+
+		#title {
+
+			position: fixed;
+			left: 0;
+			top: 0;
+
+		}
+
+		.page-wrapper {
+
+			position: fixed;
+			height: 100vh;
+			left: 0;
+			top: 0;
+			/* width: calc(100% - 2*48px); */
+			width: 30%;
+			overflow-y: scroll;
+		}
+
+		#divContent {
+
+			position: absolute;
+			left: 0;
+			right: 0;
+			margin: 0 auto;
+			width: 20rem;
+
+		}
+
+		#divPopUp {
+			background-color: lightgray;
+			border-radius: 0.5rem;
+			margin: 1ch 0;
+			max-height: 30vh;
+			padding: 1ch;
+			overflow: auto;
+			position: absolute;
+			left: 30%;
+			top: 30%;
+			z-index: 10;
+		}
+
+		/* EOS */
+	</style>
+
+	<script id="insert"></script>
+
+
+</head>
+
+<body>
+
+	<!-- https://stackoverflow.com/questions/54455270/three-js-change-camera-position-on-page-scroll -->
+
+	<div id="div1" class="page-wrapper">
+
+		<div id=divPopUp></div>
+	</div>
+
+	<canvas id="viewport"></canvas>
+
+	<div id=divContent></div>
+
+	<div id=title>
+		<h1><a href="">Test</a></h1>
+
+	</div>
+
+
+
+	<script type="text/javascript">
+
+		path = "https://eslac.github.io/art-gallery/"
+		images = [
+			"IMG_3629.jpg",
+			"IMG_3630.jpg",
+			"IMG_3631.jpg",
+			"IMG_3634.jpg",
+			"IMG_3635.jpg",
+			"IMG_3636.jpg" ];
+
+		cities = [
+			["Acajutla", "Pop. 47,678"],
+			["Apopa", "Pop. 217,733( AMSSIOO )"],
+			["Antiguo Cuscatlán", "Pop. 55,608( AMSS )"],
+			["Ciudad Delgado", "Pop. 174,825( AMSS )"],
+			["Cuscatancingo", "Pop. 117,013( AMSS )"],
+			["Ilopango", "Pop. 159,232( AMSS )"],
+			["Jiquilisco", "Pop. 47,784( AMSS )"],
+			["La Unión", "Pop. 26,739"],
+			["Mejicanos", "Pop. 211,878( AMSS )"],
+			["Metapán", "Pop. 59,004"],
+			["San Miguel", "Pop. 218,410"],
+			["San Salvador", "( capital ) Pop. City 540,989; Metro 2,290,000( AMSS )"],
+			["Santa Tecla", "Pop. 164,171( AMSS )"],
+			["Santa Ana", "Pop. 280,000"],
+			["San Martin", "Pop. 144,722( AMSS )"],
+			["Sonsonate", "Pop. 110,501"],
+			["Soyapango", "Pop. 262,975( AMSS )"]
+		];
+
+		let renderer;
+		let camera;
+		let scene;
+		//let controls;
+
+
+		init();
+
+		animate();
+
+		function init() {
+
+			scene = new THREE.Scene();
+			camera = new THREE.PerspectiveCamera( 54, 200 / window.innerHeight, 0.1, 1000 );
+
+			renderer = new THREE.WebGLRenderer( {
+				alpha: true,
+				antialias: true,
+				canvas: document.getElementById( "viewport" )
+			} );
+			renderer.setSize( 200, window.innerHeight );
+			//renderer.setClearColor( new THREE.Color( 0xffffff ) );
+			//document.body.appendChild(renderer.domElement);
+
+			camera.position.set( -100, -100, 100 );
+			camera.up.set( 0, 0, 1 );
+			camera.lookAt( 0, 0, 0 );
+
+			// camera.position.x = 1.5;
+			// camera.position.y = 5;
+			// camera.position.z = -1.5 + window.scrollY / 250.0;
+			// camera.lookAt( 0, 0, -1.5 );
+
+			//controls = new THREE.OrbitControls(camera, renderer.domElement);
+
+			let light = new THREE.AmbientLight( 0x404040 ); // soft white light
+			scene.add( light );
+
+			// white spotlight shining from the side, casting a shadow
+			let spotLight = new THREE.SpotLight( 0xffffff, 2.5, 100, Math.PI / 6 );
+			spotLight.position.set( 100, 100, 0 );
+			scene.add( spotLight );
+
+			light = new THREE.HemisphereLight( 0xffbbbb, 0xffffff );
+			light.position.set( -1, 1, 1 );
+			scene.add( light );
+			// let gridHelper = new THREE.GridHelper( 50, 10 );
+			// gridHelper.rotation.x = 1.51
+			// scene.add( gridHelper );
+
+			addBox();
+
+			txt = "";
+
+			for ( let i = 0; i < 90; i++ ) {
+
+				txt += "&nbsp;<br>"
+
+			}
+
+			div1.innerHTML += txt;
+
+			lorem = "<p>lorem ipsum, quia dolor sit, amet, consectetur, adipisci velit, sed quia non numquam eius modi tempora incidunt, ut labore et dolore magnam aliquam quaerat voluptatem. ut enim ad minima veniam, quis nostrum exercitationem ullam corporis suscipit laboriosam, nisi ut aliquid ex ea commodi consequatur? quis autem vel eum iure reprehenderit, qui in ea voluptate velit esse, quam nihil molestiae consequatur, vel illum, qui dolorem eum fugiat, quo voluptas nulla pariatur?</p>"
+			text2 = ""
+
+				for ( let i = 0; i < cities.length; i++ ) {
+					text2 += `<h2 id=city${ i } >${ cities[ i ][ 0 ] }</h2>${ lorem }`;
+				}
+			divContent.innerHTML = text2;
+
+			div1.addEventListener( "scroll", updateCamera );
+
+			THRR.updateScene();
+
+		}
+
+
+		function addBox() {
+
+			count = 18;
+
+			textures = [];
+
+			for ( let i = 0; i < 6; i++ ) {
+				textures[ i ] = new THREE.TextureLoader().load( path + images[ i ] );
+			}
+
+			buttons = [];
+			for ( let i = 0; i < count; i++ ) {
+				const geometry = new THREE.CylinderGeometry( 30, 30, 10, 30 );
+				geometry.rotateX( 1.0 + Math.random() * 1 );
+				geometry.rotateZ( Math.random() * 6 );
+				const material = new THREE.MeshStandardMaterial( {
+					map: textures[ Math.floor( Math.random() * 6 ) ]
+				} );
+				const box = new THREE.Mesh( geometry, material );
+				box.position.z = 100 - i * 50;
+				scene.add( box );
+				buttons.push( box );
+			}
+		}
+
+		function animate() {
+			requestAnimationFrame( animate );
+
+			//controls.update();
+			renderer.render( scene, camera );
+		};
+
+
+
+		function updateCamera( ev ) {
+
+			console.log( "bottom", div1.scrollHeight - div1.clientHeight );
+			console.log( "top", ev.target.scrollTop );
+
+			const styleElement = getComputedStyle( div1 );
+			//console.log( "computed", styleElement.height );
+
+			var rect = div1.getBoundingClientRect();
+			//console.log( "height: " + rect.height );
+			camera.position.z = -1.5 + div1.scrollY / 250.0;
+
+			camera.position.z = 100 - ev.target.scrollTop;
+
+			//camera.lookAt( 0, 0, ev.target.scrollTop )
+		}
+
+
+
+
+	</script>
+</body>
+
+</html>
